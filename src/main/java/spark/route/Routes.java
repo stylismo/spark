@@ -4,7 +4,7 @@
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *  
+ *
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -164,16 +164,21 @@ public class Routes {
         return removeRoute((HttpMethod) null, path);
     }
 
+    public List<RouteEntry> routes() {
+        return Collections.unmodifiableList(routes);
+    }
+
     //////////////////////////////////////////////////
     // PRIVATE METHODS
     //////////////////////////////////////////////////
 
     private void add(HttpMethod method, String url, String acceptedType, Object target) {
-        RouteEntry entry = new RouteEntry();
-        entry.httpMethod = method;
-        entry.path = url;
-        entry.target = target;
-        entry.acceptedType = acceptedType;
+//        RouteEntry entry = new RouteEntry();
+//        entry.httpMethod = method;
+//        entry.path = url;
+//        entry.target = target;
+//        entry.acceptedType = acceptedType;
+        RouteEntry entry = new RouteEntry(method, url, acceptedType, target);
         LOG.debug("Adds route: " + entry);
         // Adds to end of list
         routes.add(entry);

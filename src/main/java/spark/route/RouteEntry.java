@@ -16,23 +16,27 @@
  */
 package spark.route;
 
-import java.util.List;
-
 import spark.utils.SparkUtils;
+
+import java.util.List;
 
 /**
  * Class that holds information about routes
  *
  * @author Per Wendel
  */
-class RouteEntry {
+public class RouteEntry {
 
-    HttpMethod httpMethod;
-    String path;
-    String acceptedType;
-    Object target;
+    final HttpMethod httpMethod;
+    final String path;
+    final String acceptedType;
+    final Object target;
 
-    RouteEntry() {
+    RouteEntry(HttpMethod httpMethod, String path, String acceptedType, Object target) {
+        this.httpMethod = httpMethod;
+        this.path = path;
+        this.acceptedType = acceptedType;
+        this.target = target;
     }
 
     RouteEntry(RouteEntry entry) {

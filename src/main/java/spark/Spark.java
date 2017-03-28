@@ -4,7 +4,7 @@
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *  
+ *
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -16,6 +16,10 @@
  */
 package spark;
 
+import spark.route.RouteEntry;
+
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static spark.Service.ignite;
@@ -1038,8 +1042,8 @@ public class Spark {
     public static void initExceptionHandler(Consumer<Exception> initExceptionHandler) {
         getInstance().initExceptionHandler(initExceptionHandler);
     }
-     
-    /** 
+
+    /**
      * Set the connection to be secure, using the specified keystore and
      * truststore. This has to be called before any route mapping is done. You
      * have to supply a keystore file, truststore file is optional (keystore
@@ -1195,6 +1199,10 @@ public class Spark {
      */
     public static ModelAndView modelAndView(Object model, String viewName) {
         return new ModelAndView(model, viewName);
+    }
+
+    public static List<RouteEntry> routes() {
+        return getInstance().routes.routes();
     }
 
     /**
