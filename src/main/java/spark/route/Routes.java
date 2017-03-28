@@ -16,15 +16,11 @@
  */
 package spark.route;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import spark.routematch.RouteMatch;
 import spark.utils.MimeParse;
 import spark.utils.StringUtils;
+
+import java.util.*;
 
 /**
  * Holds the routes and performs matching from HTTP requests to routes.
@@ -173,16 +169,16 @@ public class Routes {
         return removeRoute((HttpMethod) null, path);
     }
 
+    public List<RouteEntry> routes() {
+        return Collections.unmodifiableList(routes);
+    }
+
     //////////////////////////////////////////////////
     // PRIVATE METHODS
     //////////////////////////////////////////////////
 
     private void addRoute(HttpMethod method, String url, String acceptedType, Object target) {
-        RouteEntry entry = new RouteEntry();
-        entry.httpMethod = method;
-        entry.path = url;
-        entry.target = target;
-        entry.acceptedType = acceptedType;
+        RouteEntry entry = new RouteEntry(method, url, acceptedType, target);
         LOG.debug("Adds route: " + entry);
         // Adds to end of list
         routes.add(entry);

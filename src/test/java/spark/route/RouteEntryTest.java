@@ -12,9 +12,7 @@ public class RouteEntryTest {
     @Test
     public void testMatches_BeforeAndAllPaths() {
 
-        RouteEntry entry = new RouteEntry();
-        entry.httpMethod = HttpMethod.before;
-        entry.path = SparkUtils.ALL_PATHS;
+        RouteEntry entry = new RouteEntry(HttpMethod.before, SparkUtils.ALL_PATHS, null, null);
 
         assertTrue(
                 "Should return true because HTTP method is \"Before\", the methods of route and match request match," +
@@ -26,9 +24,7 @@ public class RouteEntryTest {
     @Test
     public void testMatches_AfterAndAllPaths() {
 
-        RouteEntry entry = new RouteEntry();
-        entry.httpMethod = HttpMethod.after;
-        entry.path = SparkUtils.ALL_PATHS;
+        RouteEntry entry = new RouteEntry(HttpMethod.after, SparkUtils.ALL_PATHS, null, null);
 
         assertTrue(
                 "Should return true because HTTP method is \"After\", the methods of route and match request match," +
@@ -40,9 +36,7 @@ public class RouteEntryTest {
     @Test
     public void testMatches_NotAllPathsAndDidNotMatchHttpMethod() {
 
-        RouteEntry entry = new RouteEntry();
-        entry.httpMethod = HttpMethod.post;
-        entry.path = "/test";
+        RouteEntry entry = new RouteEntry(HttpMethod.post, "/test", null, null);
 
         assertFalse("Should return false because path names did not match",
                     entry.matches(HttpMethod.get, "/path"));
@@ -51,9 +45,7 @@ public class RouteEntryTest {
     @Test
     public void testMatches_RouteDoesNotEndWithSlash() {
 
-        RouteEntry entry = new RouteEntry();
-        entry.httpMethod = HttpMethod.get;
-        entry.path = "/test";
+        RouteEntry entry = new RouteEntry(HttpMethod.get, "/test", null, null);
 
         assertFalse("Should return false because route path does not end with a slash, does not end with " +
                             "a wildcard, and the route pah supplied ends with a slash ",
@@ -64,9 +56,7 @@ public class RouteEntryTest {
     @Test
     public void testMatches_PathDoesNotEndInSlash() {
 
-        RouteEntry entry = new RouteEntry();
-        entry.httpMethod = HttpMethod.get;
-        entry.path = "/test/";
+        RouteEntry entry = new RouteEntry(HttpMethod.get, "/test/", null, null);
 
         assertFalse("Should return false because route path ends with a slash while path supplied as parameter does" +
                             "not end with a slash", entry.matches(HttpMethod.get, "/test"));
@@ -75,9 +65,7 @@ public class RouteEntryTest {
     @Test
     public void testMatches_MatchingPaths() {
 
-        RouteEntry entry = new RouteEntry();
-        entry.httpMethod = HttpMethod.get;
-        entry.path = "/test/";
+        RouteEntry entry = new RouteEntry(HttpMethod.get, "/test/", null, null);
 
         assertTrue("Should return true because route path and path is exactly the same",
                    entry.matches(HttpMethod.get, "/test/"));
@@ -86,9 +74,7 @@ public class RouteEntryTest {
     @Test
     public void testMatches_WithWildcardOnEntryPath() {
 
-        RouteEntry entry = new RouteEntry();
-        entry.httpMethod = HttpMethod.get;
-        entry.path = "/test/*";
+        RouteEntry entry = new RouteEntry(HttpMethod.get, "/test/*", null, null);
 
         assertTrue("Should return true because path specified is covered by the route path wildcard",
                    entry.matches(HttpMethod.get, "/test/me"));
@@ -97,9 +83,7 @@ public class RouteEntryTest {
     @Test
     public void testMatches_PathsDoNotMatch() {
 
-        RouteEntry entry = new RouteEntry();
-        entry.httpMethod = HttpMethod.get;
-        entry.path = "/test/me";
+        RouteEntry entry = new RouteEntry(HttpMethod.get, "/test/me", null, null);
 
         assertFalse("Should return false because path does not match route path",
                     entry.matches(HttpMethod.get, "/test/other"));
@@ -108,9 +92,7 @@ public class RouteEntryTest {
     @Test
     public void testMatches_longRoutePathWildcard() {
 
-        RouteEntry entry = new RouteEntry();
-        entry.httpMethod = HttpMethod.get;
-        entry.path = "/test/this/resource/*";
+        RouteEntry entry = new RouteEntry(HttpMethod.get, "/test/this/resource/*", null, null);
 
         assertTrue("Should return true because path specified is covered by the route path wildcard",
                    entry.matches(HttpMethod.get, "/test/this/resource/child/id"));

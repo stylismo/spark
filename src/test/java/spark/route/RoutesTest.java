@@ -1,10 +1,9 @@
 package spark.route;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.junit.Test;
-import org.powermock.reflect.Whitebox;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,11 +17,7 @@ public class RoutesTest {
         String acceptType = "*/*";
         Object target = new Object();
 
-        RouteEntry expectedRouteEntry = new RouteEntry();
-        expectedRouteEntry.acceptedType = acceptType;
-        expectedRouteEntry.httpMethod = HttpMethod.get;
-        expectedRouteEntry.path = "/hello";
-        expectedRouteEntry.target = target;
+        RouteEntry expectedRouteEntry = new RouteEntry(HttpMethod.get, "/hello", acceptType, target);
         List<RouteEntry> expectedRoutes = new ArrayList<>();
         expectedRoutes.add(expectedRouteEntry);
 
@@ -30,7 +25,7 @@ public class RoutesTest {
         simpleRouteMatcher.add(route, acceptType, target);
 
         //then
-        List<RouteEntry> routes = Whitebox.getInternalState(simpleRouteMatcher, "routes");
+        List<RouteEntry> routes = simpleRouteMatcher.routes();
         assertTrue("Should return true because http method is valid and the route should be added to the list",
                    Util.equals(routes, expectedRoutes));
 
@@ -47,8 +42,16 @@ public class RoutesTest {
         simpleRouteMatcher.add(route, acceptType, target);
 
         //then
-        List<RouteEntry> routes = Whitebox.getInternalState(simpleRouteMatcher, "routes");
+        List<RouteEntry> routes = simpleRouteMatcher.routes();
         assertEquals("Should return 0 because test is not a valid http method, so the route is not added to the list",
                      routes.size(), 0);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void exposesUnmodifiableRoutes() throws Exception {
+        Routes simpleRouteMatcher = Routes.create();
+        List<RouteEntry> routes = simpleRouteMatcher.routes();
+
+        routes.add(new RouteEntry(HttpMethod.get, "/hello", "*/*", new Object()));
     }
 }

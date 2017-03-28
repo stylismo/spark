@@ -16,6 +16,9 @@
  */
 package spark;
 
+import spark.route.RouteEntry;
+
+import java.util.List;
 import java.util.Map;
 
 import static spark.Service.ignite;
@@ -1188,4 +1191,7 @@ public class Spark {
         return new ModelAndView(model, viewName);
     }
 
+    public static List<RouteEntry> routes() {
+        return getInstance().routes.routes();
+    }
 }
