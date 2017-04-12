@@ -29,6 +29,7 @@ import spark.ssl.SslStores;
 import spark.staticfiles.MimeType;
 import spark.staticfiles.StaticFilesConfiguration;
 
+import javax.servlet.Servlet;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
@@ -62,6 +63,7 @@ public final class Service extends Routable {
     protected String externalStaticFileFolder = null;
 
     protected Map<String, WebSocketHandlerWrapper> webSocketHandlers = null;
+    protected Map<String, Class<? extends Servlet>> servlets = null;
 
     protected int maxThreads = -1;
     protected int minThreads = -1;
@@ -289,6 +291,14 @@ public final class Service extends Routable {
         return this;
     }
 
+    public void servlet(String path, Class<? extends Servlet> servletClass) {
+        if (servlets == null)
+        {
+            servlets = new HashMap<>();
+        }
+        servlets.put(path, servletClass);
+    }
+
     /**
      * Maps the given path to the given WebSocket handler class.
      * <p>
@@ -396,9 +406,8 @@ public final class Service extends Routable {
     }
 
     private boolean hasMultipleHandlers() {
-        return webSocketHandlers != null;
+        return webSocketHandlers != null || servlets != null;
     }
-
 
     /**
      * Stops the Spark server and clears all routes
@@ -507,6 +516,8 @@ public final class Service extends Routable {
                             hasMultipleHandlers());
 
                     server.configureWebSockets(webSocketHandlers, webSocketIdleTimeoutMillis);
+
+                    server.configureServlets(servlets);
 
                     port = server.ignite(
                             ipAddress,

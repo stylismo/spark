@@ -22,6 +22,8 @@ import java.util.Optional;
 import spark.embeddedserver.jetty.websocket.WebSocketHandlerWrapper;
 import spark.ssl.SslStores;
 
+import javax.servlet.Servlet;
+
 /**
  * Represents an embedded server that can be used in Spark. (this is currently Jetty by default).
  */
@@ -73,4 +75,6 @@ public interface EmbeddedServer {
      * @return The approximate number of currently active threads
      */
     int activeThreadCount();
+
+    void configureServlets(Map<String, Class<? extends Servlet>> servlets);
 }
