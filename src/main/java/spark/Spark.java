@@ -88,6 +88,18 @@ public class Spark {
         getInstance().path(path, routeGroup);
     }
 
+    public static void path(String path, String acceptType, RouteGroup routeGroup) {
+        path(path, acceptType, null, routeGroup);
+    }
+
+    public static void path(String path, ResponseTransformer transformer, RouteGroup routeGroup) {
+        path(path, null, transformer, routeGroup);
+    }
+
+    public static void path(String path, String acceptType, ResponseTransformer transformer, RouteGroup routeGroup) {
+        getInstance().path(path, acceptType, transformer, routeGroup);
+    }
+
     /**
      * Map the route for HTTP GET requests
      *
