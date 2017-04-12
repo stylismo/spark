@@ -16,17 +16,8 @@
  */
 package spark;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import spark.embeddedserver.EmbeddedServer;
 import spark.embeddedserver.EmbeddedServers;
 import spark.embeddedserver.jetty.websocket.WebSocketHandlerClassWrapper;
@@ -37,6 +28,10 @@ import spark.route.ServletRoutes;
 import spark.ssl.SslStores;
 import spark.staticfiles.MimeType;
 import spark.staticfiles.StaticFilesConfiguration;
+
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 import static spark.globalstate.ServletFlag.isRunningFromServlet;
@@ -75,6 +70,8 @@ public final class Service extends Routable {
 
     protected EmbeddedServer server;
     protected Deque<String> pathDeque = new ArrayDeque<>();
+    protected Deque<String> acceptTypeDeque = new ArrayDeque<>();
+    protected Deque<ResponseTransformer> transformerDeque = new ArrayDeque<>();
     protected Routes routes;
 
     private boolean servletStaticLocationSet;
@@ -440,6 +437,26 @@ public final class Service extends Routable {
         pathDeque.removeLast();
     }
 
+    public void path(String path, String acceptType, ResponseTransformer transformer, RouteGroup routeGroup) {
+        pathDeque.addLast(path);
+        if (acceptType != null) {
+            acceptTypeDeque.addLast(acceptType);
+        }
+        if (transformer != null) {
+            transformerDeque.addLast(transformer);
+        }
+
+        routeGroup.addRoutes();
+
+        if (acceptType != null) {
+            acceptTypeDeque.removeLast();
+        }
+        if (transformer != null) {
+            transformerDeque.removeLast();
+        }
+        pathDeque.removeLast();
+    }
+
     public String getPaths() {
         return pathDeque.stream().collect(Collectors.joining(""));
     }
@@ -447,7 +464,22 @@ public final class Service extends Routable {
     @Override
     public void addRoute(String httpMethod, RouteImpl route) {
         init();
-        routes.add(httpMethod + " '" + getPaths() + route.getPath() + "'", route.getAcceptType(), route);
+
+        String acceptType = acceptTypeDeque.peekLast();
+        if (acceptType == null) {
+            acceptType = route.getAcceptType();
+        }
+
+        String path = httpMethod + " '" + getPaths() + route.getPath() + "'";
+
+        ResponseTransformer transformer = transformerDeque.peekLast();
+        if (transformer != null) {
+            ResponseTransformerRouteImpl transformerRoute =  ResponseTransformerRouteImpl.create(
+                    route.getPath(), acceptType, (Route) route.delegate(), transformer);
+            routes.add(path, acceptType, transformerRoute);
+        } else {
+            routes.add(path, acceptType, route);
+        }
     }
 
     @Override
@@ -470,9 +502,9 @@ public final class Service extends Routable {
                     }
 
                     server = EmbeddedServers.create(embeddedServerIdentifier,
-                                                    routes,
-                                                    staticFilesConfiguration,
-                                                    hasMultipleHandlers());
+                            routes,
+                            staticFilesConfiguration,
+                            hasMultipleHandlers());
 
                     server.configureWebSockets(webSocketHandlers, webSocketIdleTimeoutMillis);
 

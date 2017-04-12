@@ -4,7 +4,7 @@
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *  
+ *
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -85,6 +85,18 @@ public class Spark {
      */
     public static void path(String path, RouteGroup routeGroup) {
         getInstance().path(path, routeGroup);
+    }
+
+    public static void path(String path, String acceptType, RouteGroup routeGroup) {
+        path(path, acceptType, null, routeGroup);
+    }
+
+    public static void path(String path, ResponseTransformer transformer, RouteGroup routeGroup) {
+        path(path, null, transformer, routeGroup);
+    }
+
+    public static void path(String path, String acceptType, ResponseTransformer transformer, RouteGroup routeGroup) {
+        getInstance().path(path, acceptType, transformer, routeGroup);
     }
 
     /**
