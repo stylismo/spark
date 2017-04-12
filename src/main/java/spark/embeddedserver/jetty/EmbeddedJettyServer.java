@@ -4,7 +4,7 @@
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *  
+ *
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -38,6 +38,8 @@ import spark.embeddedserver.jetty.websocket.WebSocketHandlerWrapper;
 import spark.embeddedserver.jetty.websocket.WebSocketServletContextHandlerFactory;
 import spark.ssl.SslStores;
 
+import javax.servlet.Servlet;
+
 /**
  * Spark server implementation
  *
@@ -56,6 +58,7 @@ public class EmbeddedJettyServer implements EmbeddedServer {
 
     private Map<String, WebSocketHandlerWrapper> webSocketHandlers;
     private Optional<Integer> webSocketIdleTimeoutMillis;
+    private Map<String, Class<? extends Servlet>> servlets;
 
     private ThreadPool threadPool = null;
 
@@ -70,6 +73,11 @@ public class EmbeddedJettyServer implements EmbeddedServer {
 
         this.webSocketHandlers = webSocketHandlers;
         this.webSocketIdleTimeoutMillis = webSocketIdleTimeoutMillis;
+    }
+
+    @Override
+    public void configureServlets(Map<String, Class<? extends Servlet>> servlets) {
+        this.servlets = servlets;
     }
 
     /**
@@ -123,7 +131,7 @@ public class EmbeddedJettyServer implements EmbeddedServer {
             WebSocketServletContextHandlerFactory.create(webSocketHandlers, webSocketIdleTimeoutMillis);
 
         // Handle web socket routes
-        if (webSocketServletContextHandler == null) {
+        if (webSocketServletContextHandler == null && (servlets == null || servlets.isEmpty())) {
             server.setHandler(handler);
         } else {
             List<Handler> handlersInList = new ArrayList<>();
@@ -132,6 +140,15 @@ public class EmbeddedJettyServer implements EmbeddedServer {
             // WebSocket handler must be the last one
             if (webSocketServletContextHandler != null) {
                 handlersInList.add(webSocketServletContextHandler);
+            }
+
+            if (servlets != null) {
+                ServletContextHandler myContext = new ServletContextHandler(ServletContextHandler.SESSIONS);
+                for (Map.Entry<String, Class<? extends Servlet>> entry : servlets.entrySet()) {
+                    ServletHolder myViewServlet = new ServletHolder(entry.getValue());
+                    myContext.addServlet(myViewServlet, entry.getKey());
+                }
+                handlersInList.add(myContext);
             }
 
             HandlerList handlers = new HandlerList();

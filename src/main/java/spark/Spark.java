@@ -18,6 +18,7 @@ package spark;
 
 import spark.route.RouteEntry;
 
+import javax.servlet.Servlet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -1165,6 +1166,13 @@ public class Spark {
      */
     public static void webSocketIdleTimeoutMillis(int timeoutMillis) {
         getInstance().webSocketIdleTimeoutMillis(timeoutMillis);
+    }
+
+    ////////////////
+    // Servlets   //
+
+    public static void servlet(String path, Class<? extends Servlet> servlet) {
+        getInstance().servlet(path, servlet);
     }
 
     /**
