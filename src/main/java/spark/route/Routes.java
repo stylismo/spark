@@ -28,6 +28,8 @@ import spark.routematch.RouteMatch;
 import spark.utils.MimeParse;
 import spark.utils.StringUtils;
 
+import java.util.*;
+
 /**
  * Holds the routes and performs matching from HTTP requests to routes.
  * Works as Sinatra's, ie. if there are more than one match the one that was mapped first is chosen.
@@ -173,11 +175,6 @@ public class Routes {
     //////////////////////////////////////////////////
 
     private void add(HttpMethod method, String url, String acceptedType, Object target) {
-//        RouteEntry entry = new RouteEntry();
-//        entry.httpMethod = method;
-//        entry.path = url;
-//        entry.target = target;
-//        entry.acceptedType = acceptedType;
         RouteEntry entry = new RouteEntry(method, url, acceptedType, target);
         LOG.debug("Adds route: " + entry);
         // Adds to end of list
