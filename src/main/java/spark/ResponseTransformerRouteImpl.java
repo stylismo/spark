@@ -44,6 +44,7 @@ public abstract class ResponseTransformerRouteImpl extends RouteImpl {
 
             @Override
             public Object handle(Request request, Response response) throws Exception {
+                response.type(acceptType);
                 return route.handle(request, response);
             }
         };
