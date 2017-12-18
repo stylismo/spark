@@ -483,7 +483,22 @@ public final class Service extends Routable {
     @Override
     public void addRoute(HttpMethod httpMethod, RouteImpl route) {
         init();
-        routes.add(httpMethod, route.withPrefix(getPaths()));
+
+        RouteImpl withPrefix = route.withPrefix(getPaths());
+
+        String acceptType = acceptTypeDeque.peekLast();
+        if (acceptType == null) {
+            acceptType = route.getAcceptType();
+        }
+
+        ResponseTransformer transformer = transformerDeque.peekLast();
+        if (transformer != null) {
+            ResponseTransformerRouteImpl transformerRoute =  ResponseTransformerRouteImpl.create(
+                withPrefix.getPath(), acceptType, (Route) withPrefix.delegate(), transformer);
+            routes.add(httpMethod, transformerRoute);
+        } else {
+            routes.add(httpMethod, RouteImpl.create(withPrefix.getPath(), acceptType, withPrefix));
+        }
     }
 
     @Override
