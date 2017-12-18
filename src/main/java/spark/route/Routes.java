@@ -18,6 +18,7 @@ package spark.route;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,6 @@ import spark.RouteImpl;
 import spark.routematch.RouteMatch;
 import spark.utils.MimeParse;
 import spark.utils.StringUtils;
-
-import java.util.*;
 
 /**
  * Holds the routes and performs matching from HTTP requests to routes.
